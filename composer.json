@@ -1,0 +1,17 @@
+{
+    "name": "enjima/enjima",
+    "description": "Simple New Framework",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Harsha Vimukthi",
+            "email": "vimukthi.soysa@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/http-foundation": "^5.2",
+        "symfony/routing": "^5.2",
+        "symfony/http-kernel": "^5.2"
+    }
+}
