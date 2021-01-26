@@ -3,6 +3,7 @@ $a = microtime(true);
 session_start();
 require_once __DIR__.'/../vendor/autoload.php';
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
@@ -18,7 +19,6 @@ $routes->add('is_leap_year', new Routing\Route('/is_leap_year/{year}', [
     'year' => null,
     '_controller' => '\App\Http\Controllers\LeapYearController::index',
 ]));
-
 
 $a = microtime(true);
 
@@ -37,26 +37,15 @@ $matcher = new Routing\Matcher\UrlMatcher($routes, $context);
 
 $controllerResolver = new HttpKernel\Controller\ControllerResolver();
 $argumentResolver = new HttpKernel\Controller\ArgumentResolver();
+$dispatcher = new EventDispatcher();
 
+$framework = new Enjima\Core\Application($dispatcher, $matcher, $controllerResolver, $argumentResolver);
 
+$framework = new HttpKernel\HttpCache\HttpCache(
+    $framework,
+    new HttpKernel\HttpCache\Store(__DIR__.'/../cache')
+);
 
-try {
-    $request->attributes->add($matcher->match($request->getPathInfo()));
-
-    $controller = $controllerResolver->getController($request);
-
-    $arguments = $argumentResolver->getArguments($request, $controller);
-
-    $response = call_user_func_array($controller, $arguments);
-
-} catch (Routing\Exception\ResourceNotFoundException $exception) {
-    $response = new Response('Not Found', 404);
-} catch (Exception $exception) {
-    $response = new Response('An error occurred', 500);
-    exit("shit");
-}
-// var_dump($_route);
-
-
+$response = $framework->handle($request);
 
 $response->send();

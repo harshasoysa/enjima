@@ -8,6 +8,10 @@ class LeapYearController
 {
     public function index($year, Request $request)
     {
-        return new Response('Nope, this is not a leap year.');
+        $response =  new Response('Nope, this is not a leap year.'.rand());
+
+        $response->setTtl(10);
+
+        return $response;
     }
 }
